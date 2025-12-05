@@ -22,15 +22,6 @@
 #include "uart.h"
 
 
-
-
-
-
-void delay(uint32_t delay_value)
-{
-	for(uint32_t i = 0; i < delay_value; i++);
-}
-
 void init_clk(void)												/*Настройка внешнего генератора как источник тактирования на 64МГц*/
 {
 	// Enable HSI

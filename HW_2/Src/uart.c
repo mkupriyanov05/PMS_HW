@@ -97,9 +97,12 @@ void calc_LRC(uint8_t *data, size_t length) {
 
 static int8_t hex_char_to_val(char c)
 {
-    if (c >= '0' && c <= '9') return c - '0';
-    if (c >= 'A' && c <= 'F') return 10 + (c - 'A');
-    if (c >= 'a' && c <= 'f') return 10 + (c - 'a');
+    if (c >= '0' && c <= '9') 
+        return c - '0';
+    if (c >= 'A' && c <= 'F') 
+        return 10 + (c - 'A');
+    if (c >= 'a' && c <= 'f') 
+        return 10 + (c - 'a');
     return -1;
 }
 
@@ -120,13 +123,9 @@ void parse_hex(void) {
     size_t CharVals_len = RxBuf_len / 2;
 
     uint8_t CharVals[RX_BUFF_SIZE / 2 + 1] = {0};
-    if (CharVals_len > (sizeof(CharVals) / sizeof(CharVals[0]))) {
-        snprintf(TxBuffer, TX_BUFF_SIZE, "Error: Input too long");
-        return;
-    }
 
-    int8_t hi = -1;
-    int8_t lo = -1;
+    int8_t high_digit = -1;
+    int8_t low_digit = -1;
 
     int8_t i;
     for (i = 0; i < RxBuf_len; i = i + 2) {
@@ -135,22 +134,20 @@ void parse_hex(void) {
             break;
         }
             
-        hi = hex_char_to_val(RxBuffer[i]);
-        lo = hex_char_to_val(RxBuffer[i + 1]);
+        high_digit = hex_char_to_val(RxBuffer[i]);
+        low_digit = hex_char_to_val(RxBuffer[i + 1]);
         
-        if (hi < 0) {
+        if (high_digit < 0) {
             if (RxBuf_len_is_odd == true) i--;
-            snprintf(TxBuffer, TX_BUFF_SIZE, "Error: Invalid hex digit at pos %u",
-                 (unsigned)(i));
+            snprintf(TxBuffer, TX_BUFF_SIZE, "Error: Invalid hex digit at pos %d", i);
             return;
         } 
-        if (lo < 0) {
+        if (low_digit < 0) {
             if (RxBuf_len_is_odd == true) i--;
-            snprintf(TxBuffer, TX_BUFF_SIZE, "Error: Invalid hex digit at pos %u",
-                 (unsigned)(i + 1));
+            snprintf(TxBuffer, TX_BUFF_SIZE, "Error: Invalid hex digit at pos %d", i + 1);
             return;
         }
-        CharVals[i / 2] = ((hi << 4) | lo);
+        CharVals[i / 2] = high_digit * 16 + low_digit;
     }
 
     calc_LRC(CharVals, CharVals_len);			
